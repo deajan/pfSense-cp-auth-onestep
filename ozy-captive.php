@@ -1,10 +1,13 @@
 ﻿<?php
-$build = "<!-- OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication 2015102202 pfbug -->";
+$build = "<!-- OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication 2015111601 -->";
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
 /* WelcomePage() --submit--> Create / Update RADIUS user --> Login() */
 /*********************************************************************/
+
+global $brand, $hotelName, $hotelSite, $identificator;
+global $today, $build, $userName, $password;
 
 // Config file
 include "captiveportal-config.php";
@@ -21,7 +24,10 @@ $ipAddress=$_SERVER['REMOTE_ADDR'];
 #run the external command, break output into lines
 $arp=`arp $ipAddress`;
 $lines = explode(" ", $arp);
-$macAddress = $lines[3]; // Works on FreeBSD
+if (isset($line[3]))
+	$macAddress = $lines[3]; // Works on FreeBSD
+else
+	$macAddress = "";
 //$macAddress = "00:00:00:11:22:33"; // Fake MAC on dev station
 
 // Clean input function
@@ -427,7 +433,7 @@ input[type="checkbox"]:checked + label span {
 								</div>
 								<div class="control-group">
 									<div class="controls">
-										<input type="checkbox" name="newsletter" id="newsletter" value="newsletter" checked>
+										<input type="checkbox" name="newsletter" id="newsletter" value="newsletter">
 										<label for="newsletter">
 											<span></span>Recevoir nos offres
 										</label>	

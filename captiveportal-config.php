@@ -23,8 +23,9 @@ $UPDATE = true;
 
 // Hotel identification
 
-$brand = "HOTEL WIFI";
 
+
+$brand = "HOTEL WIFI";
 $hotelName = "MyHotel";					// Name of the hotel property to show in login screen
 $hotelSite = "www.example.com";			// Internet site of hotel
 $identificator = "HOTEL_ID";
