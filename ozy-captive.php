@@ -24,11 +24,11 @@ $ipAddress=$_SERVER['REMOTE_ADDR'];
 #run the external command, break output into lines
 $arp=`arp $ipAddress`;
 $lines = explode(" ", $arp);
-if (isset($line[3]))
+if (!empty($lines[3]))
 	$macAddress = $lines[3]; // Works on FreeBSD
 else
 	$macAddress = "";
-//$macAddress = "00:00:00:11:22:33"; // Fake MAC on dev station
+	//$macAddress = "00:00:00:11:22:33"; // Fake MAC on dev station
 
 // Clean input function
 function cleanInput($input) {
@@ -101,7 +101,8 @@ if(isset($_POST["cgu"]))
 	else
 	{
 		@mysql_select_db(DBNAME, $con);
-		if ($macAddress!=NULL) {
+		if ($macAddress!=NULL)
+		{
 			$query = "INSERT INTO reg_users (familyName, surName, roomNumber, emailAddress, macAddress, ipAddress, regDate, identificator, newsletter, facebook) VALUES ('$familyName', '$surName', '$roomNumber', '$emailAddress', '$macAddress' , '$ipAddress', '$regDate', '$identificator', '$newsletter', '$facebook');";
 			if ($UPDATE == true)
 			{
