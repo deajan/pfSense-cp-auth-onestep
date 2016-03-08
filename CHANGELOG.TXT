@@ -1,0 +1,11 @@
+v0.3 - 08 Mar 2016
+- Tested on pfSense 2.2.6
+- Added language configuration settings for English and French
+- Fixed authentication as same user multiple times
+- Added optional constant authentication code (see captiveportal-config.php)
+- Fixed input fields don't get empty if authentication fails
+- Added better debugging
+
+v0.2 - 16 Nov 2015
+- Initial release
+- Tested on pfSense 2.2.3

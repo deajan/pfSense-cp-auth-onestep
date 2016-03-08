@@ -1,26 +1,23 @@
 ﻿<?php
-$build = "<!-- OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication 2015111601 -->";
+$build = "<!-- OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.3 2016030803 -->";
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
 /* WelcomePage() --submit--> Create / Update RADIUS user --> Login() */
 /*********************************************************************/
 
+// global is used because pfSense php interpreter doesn't take variable definitions in functions
 global $brand, $hotelName, $hotelSite, $identificator;
 global $today, $build, $userName, $password;
+global $confirmationCode;
+
+global $emailAddress, $roomNumber, $familyName, $surName, $code;
 
 // Config file
 include "captiveportal-config.php";
 
-// Language specific stuff
-$monthList = Array('Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Decembre');
-$macAdressErrorMessage = "Votre matériel ne présente pas les caractéristiques nécessaires à la connection.";
-$databaseConnectErrorMessage = "Impossible de se connecter au serveur de base de données: ";
-$databaseRegisterErrorMessage = "Impossible de créer votre compte utilisateur";
-$incorrectInput = "Les données que vous avez entrés ne semblent pas valides.";
-$today = date('j')." ".$monthList[date('n')]." ".date('Y');
+// Get IP and mac address
 $ipAddress=$_SERVER['REMOTE_ADDR'];
-
 #run the external command, break output into lines
 $arp=`arp $ipAddress`;
 $lines = explode(" ", $arp);
@@ -44,19 +41,36 @@ function cleanInput($input) {
 }
 
 function slog($string) {
-	echo "<p style=color:red>$string</p>";
+	print "<p style=color:red>$string</p>";
 }
 
 if(isset($_POST["cgu"]))
 {
+	if (strlen($confirmationCode) > 0)
+	{
+		if (isset($_POST['code']))
+		{
+			$code = cleanInput($_POST["code"]);
+			if ($confirmationCode != $code)
+			{
+				$checkMessage = t('incorrectConfirmationCode_string');
+				$badCheck = true;
+			}
+		}
+		else
+		{
+			$checkMessage = t('incorrectConfirmationcode_string');
+			$badCheck = true;
+		}
+	}
 	if (isset($_POST['familyName']))
 		$familyName = cleanInput($_POST["familyName"]);
 	else
 		$familyName = false;
 	if (strlen($familyName) < 2)
 	{
-		WelcomePage($incorrectInput);
-		die();
+		$checkMessage = t('incorrectInput_string');
+		$badCheck = true;
 	}
 	if (isset($_POST['surName']))
 		$surName = cleanInput($_POST["surName"]);
@@ -64,8 +78,8 @@ if(isset($_POST["cgu"]))
 		$surName = false;
 	if (strlen($surName) < 2)
 	{
-		WelcomePage($incorrectInput);
-		die();
+		$checkMessage = t('incorrectInput_string');
+		$badCheck = true;
 	}
 	if (isset($_POST['roomNumber']))
 		$roomNumber = cleanInput($_POST["roomNumber"]);
@@ -73,8 +87,8 @@ if(isset($_POST["cgu"]))
 		$roomNumber = false;
 	if (strlen($roomNumber) < 1)
 	{
-		WelcomePage($incorrectInput);
-		die();
+		$checkMessage = t('incorrectInput_string');
+		$badCheck = true;
 	}
 	if (isset($_POST['emailAddress']))
 		$emailAddress = cleanInput($_POST["emailAddress"]);
@@ -82,28 +96,36 @@ if(isset($_POST["cgu"]))
 		$emailAddress = false;
 	if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL))
 	{
-		WelcomePage($incorrectInput);
-		die();
+		$checkMessage = t('incorrectInput_string');
+		$badCheck = true;
 	}
 	$regDate = date("Y-m-d H:i:s");
 	if (isset($_POST['newsletter']))
 		$newsletter = 1;
 	else
 		$newsletter = 0;
-	if (isset($_POST['facebook']))
-		$facebook = 1;
-	else
-		$facebook = 0;
-	
+
+	if ($badCheck == true)
+	{
+		WelcomePage($checkMessage);
+		die();
+	}
+
 	$con = @mysql_connect(DBHOST,DBUSER,DBPASS);
 	if (!$con)
-		WelcomePage($databaseConnectErrorMessage . utf8_encode(mysql_error()));
+	{
+		if (DEBUG == true)
+			$error_message = t('databaseConnectErrorMessage_string') . utf8_encode(mysql_error());
+		else
+			$error_message = t('databaseConnectErrorMessage_string');
+		WelcomePage($error_message);
+	}
 	else
 	{
 		@mysql_select_db(DBNAME, $con);
 		if ($macAddress!=NULL)
 		{
-			$query = "INSERT INTO reg_users (familyName, surName, roomNumber, emailAddress, macAddress, ipAddress, regDate, identificator, newsletter, facebook) VALUES ('$familyName', '$surName', '$roomNumber', '$emailAddress', '$macAddress' , '$ipAddress', '$regDate', '$identificator', '$newsletter', '$facebook');";
+			$query = "INSERT INTO reg_users (familyName, surName, roomNumber, emailAddress, macAddress, ipAddress, regDate, identificator, newsletter) VALUES ('$familyName', '$surName', '$roomNumber', '$emailAddress', '$macAddress' , '$ipAddress', '$regDate', '$identificator', '$newsletter');";
 			if ($UPDATE == true)
 			{
 				$check_query = "SELECT * FROM reg_users WHERE macAddress = '$macAddress' AND emailAddress = '$emailAddress';";
@@ -111,42 +133,68 @@ if(isset($_POST["cgu"]))
 					slog($check_query);
 				$result = @mysql_query($check_query);
 				$numrows = @mysql_num_rows($result);
-				if($numrows != 0)
-					$query = "UPDATE reg_users SET familyName = '$familyName', surName = '$surName', roomNumber = '$roomNumber' , ipAddress = '$ipAddress', regDate = '$regDate', identificator = '$identificator', newsletter = '$newsletter', facebook = '$facebook' WHERE macAddress = '$macAddress' AND emailAddress = '$emailAddress';";
+				if ($numrows != 0)
+					$query = "UPDATE reg_users SET familyName = '$familyName', surName = '$surName', roomNumber = '$roomNumber' , ipAddress = '$ipAddress', regDate = '$regDate', identificator = '$identificator', newsletter = '$newsletter' WHERE macAddress = '$macAddress' AND emailAddress = '$emailAddress';";
 			}
-			if (DEBUG == true)
-					slog($query);
+
 			if (!@mysql_query($query))
 			{
-				WelcomePage($databaseRegisterErrorMessage." (1) :" . utf8_encode(mysql_error()));
+				if (DEBUG == true)
+				{
+					slog($query);
+					$error_message = t('databaseRegisterErrorMessage_string')." (1) :" . utf8_encode(mysql_error());
+				}
+				else
+					$error_message = t('databaseRegisterErrorMessage_string')." (1)";
+				WelcomePage($error_message);
 				die();
 			}
-			
+
 			// User name and password for RADIUS
 			$userName = $emailAddress.$roomNumber;
 			$password = $familyName.$surName;
-			
-			$query = "INSERT INTO radcheck (username, attribute, value) VALUES ('$userName', 'Password', '$password');";
+
+			$check_query = "SELECT username FROM radcheck WHERE username = '$userName';";
 			if (DEBUG == true)
-					slog($query);
+				slog($query);
+			$result = @mysql_query($check_query);
+			$numrows = @mysql_num_rows($result);
+			if ($numrows != 0)
+				$query = "UPDATE radcheck SET value = '$password' WHERE username = '$userName';";
+			else
+				$query = "INSERT INTO radcheck (username, attribute, value) VALUES ('$userName', 'Password', '$password');";
+
 			if (!@mysql_query($query))
 			{
-				WelcomePage($databaseRegisterErrorMessage." (2)");
+				if (DEBUG == true)
+				{
+					slog($query);
+                                        $error_message = t('databaseRegisterErrorMessage_string')." (2) :" . utf8_encode(mysql_error());
+				}
+                                else
+                                       	$error_message = t('databaseRegisterErrorMessage_string')." (2)";
+                               	WelcomePage($error_message);
 				die();
 			}
-			
+
 			$query = "INSERT INTO radusergroup (username, groupname) VALUES ('$userName', 'Free');";
-			if (DEBUG == true)
-					slog($query);
+
 			if (!@mysql_query($query))
 			{
-				WelcomePage($databaseRegisterErrorMessage." (3)");
+				if (DEBUG == true)
+				{
+					slog($query);
+                                        $error_message = t('databaseRegisterErrorMessage_string')." (3) :" . utf8_encode(mysql_error());
+				}
+                                else
+                                       	$error_message = t('databaseRegisterErrorMessage_string')." (3)";
+                               	WelcomePage($error_message);
 				die();
 			}
 			Login();
 		}
 		else
-			WelcomePage($macAdressErrorMessage);
+			WelcomePage(t('macAdressErrorMessage_string'));
 	@mysql_close($con);
 	}
 }
@@ -161,7 +209,7 @@ function Login()
 <!DOCTYPE html>
 <html>
 	<body>
-		Please click on Continue if your browser doesn't support JavaScript.
+		<?php t('no_script'); ?>
 		<form name="loginForm" method="post" action="$PORTAL_ACTION$">
 			<input name="auth_user" type="hidden" value="<?php echo $userName; ?>">
 			<input name="auth_pass" type="hidden" value="<?php echo $password; ?>">
@@ -183,15 +231,19 @@ function WelcomePage($message = '')
 	global $hotelSite;
 	global $today;
 	global $build;
+	global $confirmationCode;
+
+	global $emailAddress, $roomNumber, $familyName, $surName, $code;
+
 ?>
 <!DOCTYPE html>
-<?php echo $build; ?>
+<?php echo $build."\n"; ?>
 <html lang="fr">
 	<head>
 		<meta charset="utf-8">
 		<title><?php echo $brand; ?> - Accès WIFI</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="<?php echo $brand; ?> - Accès WIFI">
+		<meta name="description" content="<?php echo $brand; ?> - <?php print t('pageTitle_string'); ?>">
 		<meta name="author" content="<?php echo $brand; ?>">
 
 		<link href="captiveportal-bootstrap.min.css" media="screen" rel="stylesheet" type="text/css" />
@@ -271,7 +323,7 @@ body, html {
 .messagebox {
 	/*background-color: #EEEEEE;*/
 	background: rgba(238,238,238,0.7);
-	
+
 }
 
 .formulaire {
@@ -355,13 +407,12 @@ input[type="checkbox"]:checked + label span {
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title">Conditions d'utilisation du service</h4>
+							<h4 class="modal-title"><?php print t('termsOfUse_string'); ?></h4>
 					</div>
 						<div class="modal-body">
-							<p>Ce service vous est offert par <?php echo $brand; ?>.</p>
-							<div class="padding30 grey">	
-								S'agissant d'un service gratuit, veuillez <strong>respecter</strong> les conditions normales d'utilisation
-								et les <strong>autres usagers</strong> du service en évitant de télécharger ou de regarder des vidéos haute qualité svp.
+							<p><?php print t('wifiProvidedBy_string'); ?></p>
+							<div class="padding30 grey">
+								<?php print t('generalUseMessage_string'); ?>
 								<br/>
 								<br/>
 								<?php include "captiveportal-termsofuse.html"; ?>
@@ -369,19 +420,19 @@ input[type="checkbox"]:checked + label span {
 							</div>
 						</div>
 					<div class="modal-footer">
-				<button type="button" class="btn btn-primary" data-dismiss="modal">J'ai lu</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal"><?php print t('termsOfUseRead_string'); ?></button>
 					</div>
 				</div>
 			</div>
 		</div>
-		
+
 		<!-- CGU Error modal -->
 		<div id="erreur" class="modal fade">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title">Erreur</h4>
+							<h4 class="modal-title"><?php print t('error_string'); ?></h4>
 					</div>
 						<div class="modal-body">
 							<div class="padding30 grey">
@@ -402,11 +453,11 @@ input[type="checkbox"]:checked + label span {
 			<div class="col-md-8 martop10p">
 				<div class="row messagebox padding10">
 					<div class="col-md-6">
-						<span class="uppercase">Le <?php echo $today; ?></span><br/><br/>
-						<h2>Bienvenue !</h2>
+						<span class="uppercase"> <?php print t('datePrefix_string'); print " "; print t('today'); ?></span><br/><br/>
+						<h2><?php print t('welcome_string'); ?></h2>
 						<br/>
-						L'équipe de notre établissement <?php echo $hotelName; ?> est heureuse de vous offrir la connexion internet.<br/>
-						Vous n'êtes plus qu'à 4 clics d'un accès web illimité toute la durée de votre séjour.<br/><br/><br/><br/><br/>
+						<?php print t('welcomeMessage_string'); ?>
+						<br/><br/><br/><br/><br/>
 						<?php echo $hotelSite ?>
 					</div>
 					<div class="col-md-6">
@@ -414,53 +465,52 @@ input[type="checkbox"]:checked + label span {
 							<fieldset>
 								<div class="control-group">
 									<div class="controls">
-										<input type="text" class="form-control formulaire" id="roomNumber" name="roomNumber" placeholder="Numéro de chambre">
+										<input type="text" class="form-control formulaire" id="roomNumber" name="roomNumber" value="<?php echo $roomNumber; ?>" placeholder="<?php print t('roomNumber_string'); ?>">
+									</div>
+								</div>
+								<?php if (strlen($confirmationCode) > 0) { ?>
+									<div class="control-group">
+										<div class="controls">
+											<input type="text" class="form-control formulaire" id="code" name="code" value="<?php echo $code; ?>" placeholder="<?php print t('confirmationCode_string'); ?>">
+										</div>
+									</div>
+								<?php } ?>
+								<div class="control-group">
+									<div class="controls">
+										<input type="email" class="form-control formulaire" id="emailAddress" name="emailAddress" value="<?php echo $emailAddress; ?>" placeholder="<?php print t('emailAddress_string'); ?>">
 									</div>
 								</div>
 								<div class="control-group">
 									<div class="controls">
-										<input type="email" class="form-control formulaire" id="emailAddress" name="emailAddress" placeholder="E-Mail">
+										<input type="text" class="form-control formulaire" id="familyName" name="familyName" value="<?php echo $familyName; ?>" placeholder="<?php print t('familyName_string'); ?>">
 									</div>
 								</div>
 								<div class="control-group">
 									<div class="controls">
-										<input type="text" class="form-control formulaire" id="familyName" name="familyName" placeholder="Nom">
-									</div>
-								</div>
-								<div class="control-group">
-									<div class="controls">
-										<input type="text" class="form-control formulaire" id="surName" name="surName" placeholder="Prénom">
+										<input type="text" class="form-control formulaire" id="surName" name="surName" value="<?php echo $surName; ?>"  placeholder="<?php print t('surName_string'); ?>">
 									</div>
 								</div>
 								<div class="control-group">
 									<div class="controls">
 										<input type="checkbox" name="newsletter" id="newsletter" value="newsletter">
 										<label for="newsletter">
-											<span></span>Recevoir nos offres
-										</label>	
+											<span></span><?php print t('newsletter_string'); ?>
+										</label>
 									</div>
 								</div>
 								<div class="control-group">
 									<div class="controls">
 										<input type="checkbox" name="cgu" id="cgu" value="cgu">
 										<label for="cgu">
-											<span></span>J'accepte les 
-											<a class="curpointer" data-toggle="modal" data-target="#conditions">conditions générales d'utilisation</a>
+											<span></span><?php print t('termsOfUseAccept_string'); ?>
+											<a class="curpointer" data-toggle="modal" data-target="#conditions"><?php print t('termsOfUse_string'); ?></a>
 										</label>
 									</div>
 									<span id="cguval"></span>
 								</div>
 								<div class="control-group">
 									<div class="controls">
-										<input type="checkbox" name="facebook" id="facebook" value="facebook">
-										<label for="facebook">
-											<span></span>Voir nos évenements sur notre page facebook
-										</label>
-									</div>
-								</div>
-								<div class="control-group">
-									<div class="controls">
-										<input type="submit" class="btn btn-signin right" name="connecter" value="Se connecter">
+										<input type="submit" class="btn btn-signin right" name="connecter" value="<?php print t('connect_string'); ?>">
 									</div>
 								</div>
 							</fieldset>
@@ -475,7 +525,7 @@ input[type="checkbox"]:checked + label span {
 		<!-- Form validation -->
 		<script type="text/javascript">
 			$(document).ready(function(){
-				$('input').hover(function(){	
+				$('input').hover(function(){
 					$(this).popover('show')
 				});
 				$("#enregistrement").validate({
@@ -485,6 +535,12 @@ input[type="checkbox"]:checked + label span {
 								required:true,
 								email: true
 							},
+						<?php if (strlen($confirmationCode) > 0) { ?>
+						code:{
+							required:true,
+							minlength: 3
+						},
+						<?php } ?>
 						familyName:{
 							required:true,
 							minlength: 2
@@ -498,20 +554,24 @@ input[type="checkbox"]:checked + label span {
 						}
 					},
 					messages:{
-						roomNumber:"Entrez le numéro de votre chambre svp",
+						roomNumber:"<?php print t('roomNumberValidation_string'); ?>",
 						emailAddress:{
-							required:"Renseignez une adresse email valide svp",
-							email:"Renseignez une adresse email valide svp"
+							required:"<?php print t('emailAddressValidation_string'); ?>",
+							email:"<?php print t('emailAddressValidation_string'); ?>"
+						},
+						code:{
+							required:"<?php print t('confirmationCodeValidation_string'); ?>",
+							minlength:"<?php print t('minThreeCharacters_string'); ?>"
 						},
 						familyName:{
-							required:"Entrez votre nom svp",
-							minlength:"Au minimum deux caractères"
+							required:"<?php print t('familyNameValidation_string'); ?>",
+							minlength:"<?php print t('minTwoCharacters_string'); ?>"
 						},
 						surName:{
-							required:"Entrez votre prénom svp",
-							minlength:"Au minimum deux caractères"
+							required:"<?php print t('surNameValidation_string'); ?>",
+							minlength:"<?php print t('minTwoCharacters_string'); ?>"
 						},
-						cgu:"Merci de valider les CGU"
+						cgu:"<?php print t('termsOfUseValidation_string'); ?>"
 					},
 					errorClass: "help-inline",
 					errorElement: "span",
@@ -532,7 +592,7 @@ input[type="checkbox"]:checked + label span {
 						}
 					}
 				});
-				
+
 			});
 		</script>
 		<?php
