@@ -1,6 +1,9 @@
-## pfSense Captive portal one step authentication solution
+# pfSense Captive portal one step authentication solution
 
-# Features
+This script allows to use the captive portal without having to create a user account first.
+The user account gets created / updated on first login.
+
+## Features
 
 - Integration with pfSense Captive Portal, MySQL and FreeRADIUS
 - Full responsive template
@@ -12,6 +15,6 @@
 - Nice error handling
 - Debug mode
 
-# How-to
+## How-to
 
 Manual not written in English yet. Contact me for French manual meanwhile.

@@ -1,5 +1,5 @@
 ﻿<?php
-$build = "<!-- OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.3 2016030803 -->";
+$build = "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.3 2016030803";
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -237,7 +237,7 @@ function WelcomePage($message = '')
 
 ?>
 <!DOCTYPE html>
-<?php echo $build."\n"; ?>
+<!--<?php echo $build."\n"; ?>-->
 <html lang="fr">
 	<head>
 		<meta charset="utf-8">
@@ -594,6 +594,7 @@ input[type="checkbox"]:checked + label span {
 				});
 
 			});
+		var build="<?php print CONF_BUILD; ?>";
 		</script>
 		<?php
 			// Shows error modal with $message if something didn't work

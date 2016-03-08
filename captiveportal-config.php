@@ -1,5 +1,5 @@
 <?php
-// OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication 2016030803
+DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016030803");
 // Config file for captive portal
 
 /************************************* TEST ENV */
@@ -148,6 +148,8 @@ $noScript_string = "Veuillez cliquer sur Continuer si votre navigateur ne suppor
 
 // Today format
 $today = date('j')." ".$monthList[date('n')]." ".date('Y');
+
+// Conf build
 
 return $$string;
 
