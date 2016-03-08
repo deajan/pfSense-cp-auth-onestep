@@ -28,7 +28,7 @@ $hotelName = "MyHotel";				// Name of the hotel property to show in login screen
 $hotelSite = "www.example.com";			// Internet site of hotel
 $identificator = "HOTEL_ID";			// Hotel identifcator string logged to database
 
-$confirmationCode = "0803";				// Optional connection code asked for login with minimum three characters, leave this empty to disable optional code
+$confirmationCode = "";				// Optional connection code asked for login with minimum three characters, leave this empty to disable optional code
 //$confirmationCode = "0000";
 
 //// Language function
