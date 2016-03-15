@@ -1,5 +1,5 @@
 ﻿<?php
-$build = "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.3 2016030803";
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.3 2016031501");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -10,8 +10,10 @@ $build = "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.3 2016030803";
 global $brand, $hotelName, $hotelSite, $identificator;
 global $today, $build, $userName, $password;
 global $confirmationCode;
+global $language;
 
 global $emailAddress, $roomNumber, $familyName, $surName, $code;
+global $zone, $redirecturl;
 
 // Config file
 include "captiveportal-config.php";
@@ -43,6 +45,15 @@ function cleanInput($input) {
 function slog($string) {
 	print "<p style=color:red>$string</p>";
 }
+
+
+// pfSense 2.3 fix
+if(isset($_GET['zone']))
+	$zone = $_GET['zone'];
+//$zone = $GET_['zone'];
+
+if(isset($_GET['redirecturl']))
+	$redirecturl = $_GET['redirecturl'];
 
 if(isset($_POST["cgu"]))
 {
@@ -208,8 +219,9 @@ function Login()
 ?>
 <!DOCTYPE html>
 <html>
+	<!-- Do not modify anything in this form as pfSense needs it exactly that way -->
 	<body>
-		<?php t('no_script'); ?>
+		<?php print t('noScript_string'); ?>
 		<form name="loginForm" method="post" action="$PORTAL_ACTION$">
 			<input name="auth_user" type="hidden" value="<?php echo $userName; ?>">
 			<input name="auth_pass" type="hidden" value="<?php echo $password; ?>">
@@ -232,13 +244,15 @@ function WelcomePage($message = '')
 	global $today;
 	global $build;
 	global $confirmationCode;
+	global $language;
 
 	global $emailAddress, $roomNumber, $familyName, $surName, $code;
+	global $zone, $redirecturl;
 
 ?>
 <!DOCTYPE html>
 <!--<?php echo $build."\n"; ?>-->
-<html lang="fr">
+<html lang="<?php echo $language; ?>">
 	<head>
 		<meta charset="utf-8">
 		<title><?php echo $brand; ?> - Accès WIFI</title>
@@ -461,7 +475,7 @@ input[type="checkbox"]:checked + label span {
 						<?php echo $hotelSite ?>
 					</div>
 					<div class="col-md-6">
-						<form id="enregistrement" method='post' action='ozy-captive.php'>
+						<form id="enregistrement" method='post' action="?<?php if (isset($zone)) echo "zone=$zone"; if (isset($redirecturl)) echo "&redirecturl=$redirecturl"; ?>">
 							<fieldset>
 								<div class="control-group">
 									<div class="controls">
@@ -594,7 +608,7 @@ input[type="checkbox"]:checked + label span {
 				});
 
 			});
-		var build="<?php print CONF_BUILD; ?>";
+		var build="<?php print APP_BUILD." - ".CONF_BUILD; ?>";
 		</script>
 		<?php
 			// Shows error modal with $message if something didn't work

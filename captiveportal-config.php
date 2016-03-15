@@ -33,11 +33,13 @@ $confirmationCode = "";				// Optional connection code asked for login with mini
 
 //// Language function
 
+$language = "en";				// Valid values are en, fr
+
 function t($string) {
 
-$language = "ENGLISH";				// Preconfigured values are ENGLISH and FRENCH
+global $language;
 
-if ($language == "ENGLISH")
+if ($language == "en")
 {
 //// English strings
 
@@ -91,7 +93,7 @@ $incorrectConfirmationCode_string = "The code is incorrect.";
 $noScript_string = "Please click on Continue if your browser doesn't support JavaScript.";
 }
 
-if ($language == "FRENCH")
+if ($language == "fr")
 {
 //// French strings
 
