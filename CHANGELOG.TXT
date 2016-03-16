@@ -1,5 +1,7 @@
 v0.4 - XX Mar 2016
 - Added pfSense 2.3 compatibility
+- Added MySQL password verification compatibility
+- Added more database checks
 
 v0.3 - 08 Mar 2016
 - Tested on pfSense 2.2.6

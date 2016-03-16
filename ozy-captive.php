@@ -1,5 +1,5 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.3 2016031502");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.4 2016031603");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -140,9 +140,18 @@ if(isset($_POST["cgu"]))
 			if ($UPDATE == true)
 			{
 				$check_query = "SELECT * FROM reg_users WHERE macAddress = '$macAddress' AND emailAddress = '$emailAddress';";
-				if (DEBUG == true)
-					slog($check_query);
-				$result = @mysql_query($check_query);
+				if( !$result = @mysql_query($check_query))
+				{
+					if (DEBUG == true)
+					{
+						slog($check_query);
+						$error_message = t('databaseCheckErrorMessage_string')." (1) :" . utf8_encode(mysql_error());
+					}
+					else
+						$error_message = t('databaseCheckErrorMessage_string')." (1)";
+					WelcomePage($error_message);
+					die();
+				}
 				$numrows = @mysql_num_rows($result);
 				if ($numrows != 0)
 					$query = "UPDATE reg_users SET familyName = '$familyName', surName = '$surName', roomNumber = '$roomNumber' , ipAddress = '$ipAddress', regDate = '$regDate', identificator = '$identificator', newsletter = '$newsletter' WHERE macAddress = '$macAddress' AND emailAddress = '$emailAddress';";
@@ -166,9 +175,19 @@ if(isset($_POST["cgu"]))
 			$password = $familyName.$surName;
 
 			$check_query = "SELECT username FROM radcheck WHERE username = '$userName';";
-			if (DEBUG == true)
-				slog($query);
-			$result = @mysql_query($check_query);
+			if (!$result = @mysql_query($check_query))
+			{
+				if (DEBUG == true)
+				{
+					slog($check_query);
+					$error_message = t('databaseCheckErrorMessage_string')." (2) :" . utf8_encode(mysql_error());
+				}
+				else
+					$error_message = t('databaseCheckErrorMessage_string')." (2)";
+				WelcomePage($error_message);
+				die();
+			}
+
 			$numrows = @mysql_num_rows($result);
 			if ($numrows != 0)
 				$query = "UPDATE radcheck SET value = '$password' WHERE username = '$userName';";
@@ -188,19 +207,36 @@ if(isset($_POST["cgu"]))
 				die();
 			}
 
-			$query = "INSERT INTO radusergroup (username, groupname) VALUES ('$userName', 'Free');";
-
-			if (!@mysql_query($query))
+			$check_query = "SELECT username FROM radusergroup WHERE username = '$userName';";
+			if (!$result = @mysql_query($check_query))
 			{
 				if (DEBUG == true)
 				{
-					slog($query);
-                                        $error_message = t('databaseRegisterErrorMessage_string')." (3) :" . utf8_encode(mysql_error());
+					slog($check_query);
+					$error_message = t('databaseCheckErrorMessage_string')." (3) :" . utf8_encode(mysql_error());
 				}
-                                else
-                                       	$error_message = t('databaseRegisterErrorMessage_string')." (3)";
-                               	WelcomePage($error_message);
+				else
+					$error_message = t('databaseCheckErrorMessage_string')." (3)";
+				WelcomePage($error_message);
 				die();
+			}
+
+			$numrows = @mysql_num_rows($result);
+			if ($numrows = 0)
+			{
+				$query = "INSERT INTO radusergroup (username, groupname) VALUES ('$userName', 'Free');";
+				if (!@mysql_query($query))
+				{
+					if (DEBUG == true)
+					{
+						slog($query);
+                                        	$error_message = t('databaseRegisterErrorMessage_string')." (3) :" . utf8_encode(mysql_error());
+					}
+                                	else
+                                       		$error_message = t('databaseRegisterErrorMessage_string')." (3)";
+                               		WelcomePage($error_message);
+					die();
+				}
 			}
 			Login();
 		}
@@ -222,6 +258,14 @@ function Login()
 	<!-- Do not modify anything in this form as pfSense needs it exactly that way -->
 	<body>
 		<?php print t('noScript_string'); ?>
+		<form method="post" action="$PORTAL_ACTION$">
+   			<input name="auth_user" type="text" value="<?php echo $userName; ?>">
+   			<input name="auth_pass" type="password" value="<?php echo $password; ?>">
+   			<!--<input name="auth_voucher" type="text">-->
+   			<input name="redirurl" type="hidden" value="$PORTAL_REDIRURL$">
+   			<input name="accept" type="submit" value="Continue">
+		</form>
+		<!--
 		<form name="loginForm" method="post" action="$PORTAL_ACTION$">
 			<input name="auth_user" type="hidden" value="<?php echo $userName; ?>">
 			<input name="auth_pass" type="hidden" value="<?php echo $password; ?>">
@@ -229,8 +273,9 @@ function Login()
 			<input id="submitbtn" name="accept" type="submit" value="Continue">
 		</form>
 		<script type="text/javascript">
-			document.getElementById("submitbtn").click();
+			//document.getElementById("submitbtn").click();
 		</script>
+		-->
 	</body>
 </html>
 <?php

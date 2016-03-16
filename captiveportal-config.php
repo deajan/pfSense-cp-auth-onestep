@@ -1,5 +1,5 @@
 <?php
-DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016030803");
+DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016031601");
 // Config file for captive portal
 
 /************************************* TEST ENV */
@@ -37,7 +37,7 @@ $language = "en";				// Valid values are en, fr
 
 function t($string) {
 
-global $language;
+global $language, $brand, $hotelName, $hotelSite;
 
 if ($language == "en")
 {
@@ -50,7 +50,7 @@ $pageTitle_string = "Wifi Access";
 $termsOfUse_string = "Terms of use";
 $termsOfUseRead_string = "I've read";
 $termsOfUseAccept_string ="I accept the";
-$wifiProviedBy_string = "This service is provied by $brand";
+$wifiProvidedBy_string = "This service is provied by $brand";
 $generalUseMessage_string = "Being a free service, please <strong>respect</strong> the terms of use and the <strong>other users</strong> by not using all available bandwidth.";
 $error_string = "Error";
 $datePrefix_string = "The";
@@ -88,6 +88,7 @@ $monthList = Array('January', 'February', 'March', 'April', 'May', 'June', 'July
 $macAdressErrorMessage_string = "Your device doesn't provide all necessary data for connection.";
 $databaseConnectErrorMessage_string = "Cannot connect to the database. ";
 $databaseRegisterErrorMessage_string = "Cannot register your user account.";
+$databaseCheckErrorMessage_string = "Cannot check database for user.";
 $incorrectInput_string = "The input you provided is incorrect.";
 $incorrectConfirmationCode_string = "The code is incorrect.";
 $noScript_string = "Please click on Continue if your browser doesn't support JavaScript.";
@@ -142,6 +143,7 @@ $monthList = Array('Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juill
 $macAdressErrorMessage_string = "Votre matériel ne présente pas les caractéristiques nécessaires à la connection.";
 $databaseConnectErrorMessage_string = "Impossible de se connecter au serveur de base de données. ";
 $databaseRegisterErrorMessage_string = "Impossible de créer votre compte utilisateur.";
+$databaseCheckErrorMessage_string = "Impossible de vérifier la base de données pour l'utilisateur.";
 $incorrectInput_string = "Les données que vous avez entrés ne semblent pas valides.";
 $incorrectConfirmationCode_string = "Le code établissement ne semble pas correct.";
 $noScript_string = "Veuillez cliquer sur Continuer si votre navigateur ne supporte pas le JavaScript.";
