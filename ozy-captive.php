@@ -1,5 +1,5 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.4 2016031603");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.4 2016031604");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -222,7 +222,7 @@ if(isset($_POST["cgu"]))
 			}
 
 			$numrows = @mysql_num_rows($result);
-			if ($numrows = 0)
+			if ($numrows == 0)
 			{
 				$query = "INSERT INTO radusergroup (username, groupname) VALUES ('$userName', 'Free');";
 				if (!@mysql_query($query))
