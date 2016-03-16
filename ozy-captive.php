@@ -1,5 +1,5 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.3 2016031501");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.3 2016031502");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -13,7 +13,7 @@ global $confirmationCode;
 global $language;
 
 global $emailAddress, $roomNumber, $familyName, $surName, $code;
-global $zone, $redirecturl;
+global $zone, $redirurl;
 
 // Config file
 include "captiveportal-config.php";
@@ -52,8 +52,8 @@ if(isset($_GET['zone']))
 	$zone = $_GET['zone'];
 //$zone = $GET_['zone'];
 
-if(isset($_GET['redirecturl']))
-	$redirecturl = $_GET['redirecturl'];
+if(isset($_GET['redirurl']))
+	$redirurl = $_GET['redirurl'];
 
 if(isset($_POST["cgu"]))
 {
@@ -247,7 +247,7 @@ function WelcomePage($message = '')
 	global $language;
 
 	global $emailAddress, $roomNumber, $familyName, $surName, $code;
-	global $zone, $redirecturl;
+	global $zone, $redirurl;
 
 ?>
 <!DOCTYPE html>
@@ -475,7 +475,7 @@ input[type="checkbox"]:checked + label span {
 						<?php echo $hotelSite ?>
 					</div>
 					<div class="col-md-6">
-						<form id="enregistrement" method='post' action="?<?php if (isset($zone)) echo "zone=$zone"; if (isset($redirecturl)) echo "&redirecturl=$redirecturl"; ?>">
+						<form id="enregistrement" method='post' action="?<?php if (isset($zone)) echo "zone=$zone"; if (isset($redirurl)) echo "&redirurl=$redirurl"; ?>">
 							<fieldset>
 								<div class="control-group">
 									<div class="controls">
