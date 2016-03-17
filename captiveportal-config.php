@@ -1,5 +1,5 @@
 <?php
-DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016031701");
+DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016031702");
 // Config file for captive portal
 
 /************************************* TEST ENV */
@@ -28,6 +28,13 @@ $hotelName = "MyHotel";				// Name of the hotel property to show in login screen
 $hotelSite = "www.example.com";			// Internet site of hotel
 $identificator = "HOTEL_ID";			// Hotel identifcator string logged to database
 
+//// Information to get
+$askForRoomNumber = true;
+$askForEmailAddress = true;
+$askForFamilyName = true;
+$askForSurName = true;
+$askForNewsletter = true;
+$askForTermsOfUse = true;
 $confirmationCode = "";				// Optional connection code asked for login with minimum three characters, leave this empty to disable optional code
 //$confirmationCode = "0000";
 
@@ -75,7 +82,7 @@ $minTwoCharacters_string = "Minmum two characters";
 $minThreeCharacters_string = "Minimum three characters";
 
 // Checkbox strings
-$newsletter_string = "Get our newsletter";
+$newsletter_string = "Subscribe to our newsletter";
 
 // Connect button string
 $connect_string = "Connect";

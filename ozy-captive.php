@@ -1,5 +1,5 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.4 2016031701");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.4 2016031702");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -14,6 +14,8 @@ global $language;
 
 global $emailAddress, $roomNumber, $familyName, $surName, $code;
 global $zone, $redirurl;
+
+global $askForRoomNumber, $askForEmailAddress, $askForFamilyName, $askForSurName, $askForNewsletter, $askForTermsOfUse;
 
 // Config file
 include "captiveportal-config.php";
@@ -54,7 +56,7 @@ if(isset($_GET['zone']))
 if(isset($_GET['redirurl']))
 	$redirurl = $_GET['redirurl'];
 
-if(isset($_POST["cgu"]))
+if(isset($_POST["termsOfUse"]))
 {
 	if (strlen($confirmationCode) > 0)
 	{
@@ -77,7 +79,7 @@ if(isset($_POST["cgu"]))
 		$familyName = cleanInput($_POST["familyName"]);
 	else
 		$familyName = false;
-	if (strlen($familyName) < 2)
+	if ((strlen($familyName) < 2) && ($askForFamilyName == true))
 	{
 		$checkMessage = t('incorrectInput_string');
 		$badCheck = true;
@@ -86,7 +88,7 @@ if(isset($_POST["cgu"]))
 		$surName = cleanInput($_POST["surName"]);
 	else
 		$surName = false;
-	if (strlen($surName) < 2)
+	if ((strlen($surName) < 2) && ($askForSurName == true))
 	{
 		$checkMessage = t('incorrectInput_string');
 		$badCheck = true;
@@ -95,7 +97,7 @@ if(isset($_POST["cgu"]))
 		$roomNumber = cleanInput($_POST["roomNumber"]);
 	else
 		$roomNumber = false;
-	if (strlen($roomNumber) < 1)
+	if ((strlen($roomNumber) < 1) && ($askForRoomNumber == true))
 	{
 		$checkMessage = t('incorrectInput_string');
 		$badCheck = true;
@@ -104,7 +106,7 @@ if(isset($_POST["cgu"]))
 		$emailAddress = cleanInput($_POST["emailAddress"]);
 	else
 		$emailAddress = false;
-	if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL))
+	if ((!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) && ($askForEmailAddress == true))
 	{
 		$checkMessage = t('incorrectInput_string');
 		$badCheck = true;
@@ -285,6 +287,8 @@ function WelcomePage($message = '')
 	global $emailAddress, $roomNumber, $familyName, $surName, $code;
 	global $zone, $redirurl;
 
+	global $askForRoomNumber, $askForEmailAddress, $askForFamilyName, $askForSurName, $askForNewsletter, $askForTermsOfUse;
+
 ?>
 <!DOCTYPE html>
 <!--<?php echo $build."\n"; ?>-->
@@ -451,7 +455,7 @@ input[type="checkbox"]:checked + label span {
 		<script type="text/javascript" src="captiveportal-bootstrap.min.js"></script>
 	</head>
 	<body>
-		<!-- CGU Modal -->
+		<!-- Terms Of Use Modal -->
 		<div id="conditions" class="modal fade">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -476,7 +480,7 @@ input[type="checkbox"]:checked + label span {
 			</div>
 		</div>
 
-		<!-- CGU Error modal -->
+		<!-- Terms Of Use Error modal -->
 		<div id="erreur" class="modal fade">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -513,33 +517,51 @@ input[type="checkbox"]:checked + label span {
 					<div class="col-md-6">
 						<form id="enregistrement" method='post' action="?<?php if (isset($zone)) echo "zone=$zone"; if (isset($redirurl)) echo "&redirurl=$redirurl"; ?>">
 							<fieldset>
+								<?php if ($askForRoomNumber == true) { ?>
 								<div class="control-group">
 									<div class="controls">
 										<input type="text" class="form-control formulaire" id="roomNumber" name="roomNumber" value="<?php echo $roomNumber; ?>" placeholder="<?php print t('roomNumber_string'); ?>">
 									</div>
 								</div>
-								<?php if (strlen($confirmationCode) > 0) { ?>
+								<?php
+								}
+								if (strlen($confirmationCode) > 0) { ?>
 									<div class="control-group">
 										<div class="controls">
 											<input type="text" class="form-control formulaire" id="code" name="code" value="<?php echo $code; ?>" placeholder="<?php print t('confirmationCode_string'); ?>">
 										</div>
 									</div>
-								<?php } ?>
+								<?php
+								}
+								if ($askForEmailAddress == true) {
+								?>
 								<div class="control-group">
 									<div class="controls">
 										<input type="email" class="form-control formulaire" id="emailAddress" name="emailAddress" value="<?php echo $emailAddress; ?>" placeholder="<?php print t('emailAddress_string'); ?>">
 									</div>
 								</div>
+								<?php
+								}
+								if ($askForFamilyName == true) {
+								?>
 								<div class="control-group">
 									<div class="controls">
 										<input type="text" class="form-control formulaire" id="familyName" name="familyName" value="<?php echo $familyName; ?>" placeholder="<?php print t('familyName_string'); ?>">
 									</div>
 								</div>
+								<?php
+								}
+								if ($askForSurName == true) {
+								?>
 								<div class="control-group">
 									<div class="controls">
 										<input type="text" class="form-control formulaire" id="surName" name="surName" value="<?php echo $surName; ?>"  placeholder="<?php print t('surName_string'); ?>">
 									</div>
 								</div>
+								<?php
+								}
+								if ($askForNewsletter == true) {
+								?>
 								<div class="control-group">
 									<div class="controls">
 										<input type="checkbox" name="newsletter" id="newsletter" value="newsletter">
@@ -548,16 +570,23 @@ input[type="checkbox"]:checked + label span {
 										</label>
 									</div>
 								</div>
+								<?php
+								}
+								if ($askForTermsOfUse == true) {
+								?>
 								<div class="control-group">
 									<div class="controls">
-										<input type="checkbox" name="cgu" id="cgu" value="cgu">
-										<label for="cgu">
+										<input type="checkbox" name="termsOfUse" id="termsOfUse" value="termsOfUSe">
+										<label for="termsOfUse">
 											<span></span><?php print t('termsOfUseAccept_string'); ?>
 											<a class="curpointer" data-toggle="modal" data-target="#conditions"><?php print t('termsOfUse_string'); ?></a>
 										</label>
 									</div>
-									<span id="cguval"></span>
+									<span id="termsOfUseVal"></span>
 								</div>
+								<?php
+								}
+								?>
 								<div class="control-group">
 									<div class="controls">
 										<input type="submit" class="btn btn-signin right" name="connecter" value="<?php print t('connect_string'); ?>">
@@ -599,7 +628,7 @@ input[type="checkbox"]:checked + label span {
 							required:true,
 							minlength: 2
 						},
-						cgu:{
+						termsOfUse:{
 							required:true
 						}
 					},
@@ -621,7 +650,7 @@ input[type="checkbox"]:checked + label span {
 							required:"<?php print t('surNameValidation_string'); ?>",
 							minlength:"<?php print t('minTwoCharacters_string'); ?>"
 						},
-						cgu:"<?php print t('termsOfUseValidation_string'); ?>"
+						termsOfUse:"<?php print t('termsOfUseValidation_string'); ?>"
 					},
 					errorClass: "help-inline",
 					errorElement: "span",
@@ -636,7 +665,7 @@ input[type="checkbox"]:checked + label span {
 					errorPlacement: function (error, element) {
 						if (element.is(":checkbox")) {
 							//element.closest('.span').append(error)
-							$('#cguval').append(error);
+							$('#termsOfUseVal').append(error);
 						} else {
 							error.insertAfter(element);
 						}
