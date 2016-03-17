@@ -1,5 +1,5 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.4 2016031604");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.4 2016031701");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -47,10 +47,9 @@ function slog($string) {
 }
 
 
-// pfSense 2.3 fix
+// pfSense 2.3 fix, see https://forum.pfsense.org/index.php?topic=105567.0
 if(isset($_GET['zone']))
 	$zone = $_GET['zone'];
-//$zone = $GET_['zone'];
 
 if(isset($_GET['redirurl']))
 	$redirurl = $_GET['redirurl'];
@@ -258,24 +257,16 @@ function Login()
 	<!-- Do not modify anything in this form as pfSense needs it exactly that way -->
 	<body>
 		<?php print t('noScript_string'); ?>
-		<form method="post" action="$PORTAL_ACTION$">
-   			<input name="auth_user" type="text" value="<?php echo $userName; ?>">
-   			<input name="auth_pass" type="password" value="<?php echo $password; ?>">
-   			<!--<input name="auth_voucher" type="text">-->
-   			<input name="redirurl" type="hidden" value="$PORTAL_REDIRURL$">
-   			<input name="accept" type="submit" value="Continue">
-		</form>
-		<!--
 		<form name="loginForm" method="post" action="$PORTAL_ACTION$">
 			<input name="auth_user" type="hidden" value="<?php echo $userName; ?>">
 			<input name="auth_pass" type="hidden" value="<?php echo $password; ?>">
+			<input name="zone" type="hidden" value="$PORTAL_ZONE$">
 			<input name="redirurl" type="hidden" value="$PORTAL_REDIRURL$">
 			<input id="submitbtn" name="accept" type="submit" value="Continue">
 		</form>
 		<script type="text/javascript">
-			//document.getElementById("submitbtn").click();
+			document.getElementById("submitbtn").click();
 		</script>
-		-->
 	</body>
 </html>
 <?php

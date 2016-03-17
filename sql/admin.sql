@@ -6,6 +6,9 @@
 ##		 to something else.  Also update raddb/sql.conf
 ##		 with the new RADIUS password.
 ##
+##	WARNING2: Please execute these commands after
+##                all other files so referenced tables exist.
+##
 ##	$Id: 2c1d69be33831669a9520724af23e4b0cb4866ca $
 
 #
@@ -21,3 +24,8 @@ GRANT SELECT ON radius.* TO 'radius'@'localhost';
 #  i.e. 
 GRANT ALL on radius.radacct TO 'radius'@'localhost';
 GRANT ALL on radius.radpostauth TO 'radius'@'localhost';
+
+GRANT ALL PRIVILEGES ON radius.reg_users TO 'radius'@'localhost';
+GRANT ALL PRIVILEGES ON radius.radcheck TO 'radius'@'localhost';
+GRANT ALL PRIVILEGES ON radius.radusergroup TO 'radius'@'localhost';
+FLUSH PRIVIELGES;

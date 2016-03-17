@@ -1,5 +1,5 @@
 <?php
-DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016031601");
+DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016031701");
 // Config file for captive portal
 
 /************************************* TEST ENV */
@@ -55,7 +55,7 @@ $generalUseMessage_string = "Being a free service, please <strong>respect</stron
 $error_string = "Error";
 $datePrefix_string = "The";
 $welcome_string = "Welcome";
-$welcomeMessage_string = "Our staff at $hotelName is happy to provide you free internet access.<br/> You're just 4 clics away from unlimited web access for your whole stay.";
+$welcomeMessage_string = "$hotelName is happy to provide you free internet access.<br/> You're just 4 clics away from unlimited web access for your whole stay.";
 
 // UI field strings
 $roomNumber_string = "Room Number";
@@ -75,7 +75,7 @@ $minTwoCharacters_string = "Minmum two characters";
 $minThreeCharacters_string = "Minimum three characters";
 
 // Checkbox strings
-$newsletter_string = "Get our offers";
+$newsletter_string = "Get our newsletter";
 
 // Connect button string
 $connect_string = "Connect";
