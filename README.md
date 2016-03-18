@@ -17,4 +17,5 @@ The user account gets created / updated on first login.
 
 ## How-to
 
-Manual not written in English yet. Contact me for French manual meanwhile.
+Full documentation is available here (see the HTML link for English doc)
+http://netpower.fr/pfcp-pfSense-auth-onestep
