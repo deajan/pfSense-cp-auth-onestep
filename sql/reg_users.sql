@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS `reg_users` (
   `regDate` datetime NOT NULL,
   `identificator` varchar(25) NOT NULL,
   `newsletter` boolean,
-  `facebook` boolean,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
