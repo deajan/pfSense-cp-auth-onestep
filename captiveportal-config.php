@@ -18,7 +18,8 @@ DEFINE("DBUSER", "radius");
 DEFINE("DBPASS", "radpass");
 DEFINE("DBNAME", "radius");
 
-// All users login attempts are all logged or only the last attempt depending on this setting
+// When set to true, all successful user logins are written to database
+// When set to false, only the last successful user login is written to database
 $UPDATE = true;
 
 //// Hotel identification
@@ -29,7 +30,9 @@ $hotelSite = "www.example.com";			// Internet site of hotel
 $identificator = "HOTEL_ID";			// Hotel identifcator string logged to database
 
 //// Information to get
-$askForRoomNumber = true;
+//Be aware that RADIUS username is generated from email and room number and password is generated from familyname and surname, so don't disable all of them at once.
+
+$askForRoomNumber = false;
 $askForEmailAddress = true;
 $askForFamilyName = true;
 $askForSurName = true;
@@ -158,7 +161,7 @@ $noScript_string = "Veuillez cliquer sur Continuer si votre navigateur ne suppor
 }
 
 // Today format
-$today = date('j')." ".$monthList[(date('n') - 1)]." ".date('Y');
+$today = date('j')." ".$monthList[date('n')]." ".date('Y');
 
 // Conf build
 

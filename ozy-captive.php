@@ -1,5 +1,5 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.4 2016031702");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.42 2016051901");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -17,6 +17,8 @@ global $zone, $redirurl;
 
 global $askForRoomNumber, $askForEmailAddress, $askForFamilyName, $askForSurName, $askForNewsletter, $askForTermsOfUse;
 
+global $UPDATE;
+
 // Config file
 include "captiveportal-config.php";
 
@@ -28,8 +30,7 @@ $lines = explode(" ", $arp);
 if (!empty($lines[3]))
 	$macAddress = $lines[3]; // Works on FreeBSD
 else
-	$macAddress = "";
-	//$macAddress = "00:00:00:11:22:33"; // Fake MAC on dev station
+	$macAddress = "fa:ke:ma:c:ad:dr"; // Fake MAC on dev station
 
 // Clean input function
 function cleanInput($input) {
@@ -51,16 +52,16 @@ function slog($string) {
 
 // pfSense 2.3 fix, see https://forum.pfsense.org/index.php?topic=105567.0
 if(isset($_GET['zone']))
-	$zone = $_GET['zone'];
+	$zone = cleanInput($_GET["zone"]);
 
 if(isset($_GET['redirurl']))
-	$redirurl = $_GET['redirurl'];
+	$redirurl = cleanInput($_GET["redirurl"]);
 
 if(isset($_POST["termsOfUse"]))
 {
 	if (strlen($confirmationCode) > 0)
 	{
-		if (isset($_POST['code']))
+		if (isset($_POST["code"]))
 		{
 			$code = cleanInput($_POST["code"]);
 			if ($confirmationCode != $code)
@@ -75,7 +76,7 @@ if(isset($_POST["termsOfUse"]))
 			$badCheck = true;
 		}
 	}
-	if (isset($_POST['familyName']))
+	if (isset($_POST["familyName"]))
 		$familyName = cleanInput($_POST["familyName"]);
 	else
 		$familyName = false;
@@ -84,7 +85,7 @@ if(isset($_POST["termsOfUse"]))
 		$checkMessage = t('incorrectInput_string');
 		$badCheck = true;
 	}
-	if (isset($_POST['surName']))
+	if (isset($_POST["surName"]))
 		$surName = cleanInput($_POST["surName"]);
 	else
 		$surName = false;
@@ -93,7 +94,7 @@ if(isset($_POST["termsOfUse"]))
 		$checkMessage = t('incorrectInput_string');
 		$badCheck = true;
 	}
-	if (isset($_POST['roomNumber']))
+	if (isset($_POST["roomNumber"]))
 		$roomNumber = cleanInput($_POST["roomNumber"]);
 	else
 		$roomNumber = false;
@@ -102,7 +103,7 @@ if(isset($_POST["termsOfUse"]))
 		$checkMessage = t('incorrectInput_string');
 		$badCheck = true;
 	}
-	if (isset($_POST['emailAddress']))
+	if (isset($_POST["emailAddress"]))
 		$emailAddress = cleanInput($_POST["emailAddress"]);
 	else
 		$emailAddress = false;
@@ -112,7 +113,7 @@ if(isset($_POST["termsOfUse"]))
 		$badCheck = true;
 	}
 	$regDate = date("Y-m-d H:i:s");
-	if (isset($_POST['newsletter']))
+	if (isset($_POST["newsletter"]))
 		$newsletter = 1;
 	else
 		$newsletter = 0;
@@ -412,6 +413,30 @@ body, html {
 	height: 100%;
 }
 
+.vertical-text {
+    -moz-transform-origin:0 50%;
+    -moz-transform:rotate(-90deg) translate(-50%, 50%);
+    -webkit-transform-origin:0 50%;
+    -webkit-transform:rotate(-90deg) translate(-50%, 50%);
+    -o-transform-origin:0 50%;
+    -o-transform:rotate(-90deg) translate(-50%, 50%);
+    -ms-transform-origin:0 50%;
+    -ms-transform:rotate(-90deg) translate(-50%, 50%);
+    transform-origin:0 50%;
+    transform:rotate(-90deg) translate(-50%, 50%);
+    position:absolute;
+    top:0;
+    bottom:0;
+    left: -50px;
+    height:2em; /* line-height of .wrapper div:first-child span */
+    margin:auto;
+    font-weight:bold;
+    line-height:2em; /* Copy to other locations */
+    color: #FFF;
+    opacity: 0.7;
+    font-size: 15vh;
+}
+
 .right {
 	float: right;
 }
@@ -502,7 +527,8 @@ input[type="checkbox"]:checked + label span {
 		</div>
 
 		<div class="container">
-			<img class="logo" src="captiveportal-sidelogo.png">
+			<div class="vertical-text"><?php echo $brand; ?></div>
+			<!--<img class="logo" src="captiveportal-sidelogo.png"> Obsolete png logo -->
 			<div class="col-md-2"></div>
 			<div class="col-md-8 martop10p">
 				<div class="row messagebox padding10">
