@@ -161,7 +161,7 @@ $noScript_string = "Veuillez cliquer sur Continuer si votre navigateur ne suppor
 }
 
 // Today format
-$today = date('j')." ".$monthList[date('n')]." ".date('Y');
+$today = date('j')." ".$monthList[(date('n') - 1)]." ".date('Y');
 
 // Conf build
 
