@@ -305,7 +305,7 @@ function WelcomePage($message = '')
 
 		<style type="text/css">
 body {
-  background:url('captiveportal-background.jpg') fixed center #FD6323;
+  background:url('captiveportal-background.jpg') fixed center #2266DD;
   background-repeat: no-repeat;
   background-size: 100%;
 }
