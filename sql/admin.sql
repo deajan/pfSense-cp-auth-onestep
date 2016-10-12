@@ -28,4 +28,4 @@ GRANT ALL on radius.radpostauth TO 'radius'@'localhost';
 GRANT ALL PRIVILEGES ON radius.reg_users TO 'radius'@'localhost';
 GRANT ALL PRIVILEGES ON radius.radcheck TO 'radius'@'localhost';
 GRANT ALL PRIVILEGES ON radius.radusergroup TO 'radius'@'localhost';
-FLUSH PRIVIELGES;
+FLUSH PRIVILEGES;
