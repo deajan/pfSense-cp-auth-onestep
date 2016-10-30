@@ -1,5 +1,5 @@
 <?php
-DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016051901");
+DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016103001");
 // Config file for captive portal
 
 /************************************* TEST ENV */
@@ -43,8 +43,10 @@ $confirmationCode = "";				// Optional connection code asked for login with mini
 
 //// Language function
 
-$language = "en";				// Valid values are en, fr
+$validLanguages = Array('en', 'fr');		// When adding languages, add a new entry here
+$language = "en";				// May be superseeded by passing language parameter in URL
 
+//TODO: function t approach of assigning all strings is not very effective (all strings assigned on every run!)
 function t($string) {
 
 global $language, $brand, $hotelName, $hotelSite;

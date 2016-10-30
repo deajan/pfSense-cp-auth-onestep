@@ -1,5 +1,5 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.42 2016051901");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.44 2016103001");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -10,7 +10,7 @@ define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.42 
 global $brand, $hotelName, $hotelSite, $identificator;
 global $today, $build, $userName, $password;
 global $confirmationCode;
-global $language;
+global $language, $validLanguages;
 
 global $emailAddress, $roomNumber, $familyName, $surName, $code;
 global $zone, $redirurl;
@@ -30,7 +30,7 @@ $lines = explode(" ", $arp);
 if (!empty($lines[3]))
 	$macAddress = $lines[3]; // Works on FreeBSD
 else
-	$macAddress = "fa:ke:ma:c:ad:dr"; // Fake MAC on dev station
+	$macAddress = "fa:ke:ma:c:ad:dr"; // Fake MAC on dev station which is probably not FreeBSD
 
 // Clean input function
 function cleanInput($input) {
@@ -46,9 +46,14 @@ function cleanInput($input) {
 }
 
 function slog($string) {
-	print "<p style=color:red>$string</p>";
+	print "<p style=color:red>Value: $string</p>";
 }
 
+
+if(isset($_GET['language']))
+	$language = cleanInput($_GET["language"]);
+if (!in_array($language, $validLanguages))
+	$language="en";
 
 // pfSense 2.3 fix, see https://forum.pfsense.org/index.php?topic=105567.0
 if(isset($_GET['zone']))
@@ -283,7 +288,7 @@ function WelcomePage($message = '')
 	global $today;
 	global $build;
 	global $confirmationCode;
-	global $language;
+	global $language, $validLanguages;
 
 	global $emailAddress, $roomNumber, $familyName, $surName, $code;
 	global $zone, $redirurl;
@@ -538,7 +543,25 @@ input[type="checkbox"]:checked + label span {
 						<br/>
 						<?php print t('welcomeMessage_string'); ?>
 						<br/><br/><br/><br/><br/>
-						<?php echo $hotelSite ?>
+						<?php
+						echo $hotelSite;
+						if (count($validLanguages) > 1) {
+							echo "  -  ";
+							foreach ($validLanguages as &$lang) {
+								$link="http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+								if (parse_url($link, PHP_URL_QUERY)) {
+									if (strpos($link, "language=") !== false)
+										$link=preg_replace("@language=..@", "language=$lang", $link);
+									else
+										$link=$link .= "&language=$lang";
+								}
+								else
+									$link=$link .= "?language=$lang";
+								$link=htmlspecialchars($link, ENT_QUOTES, 'UTF-8' );
+								echo "<a href=\"$link\">$lang</a> ";
+							}
+						}
+						?>
 					</div>
 					<div class="col-md-6">
 						<form id="enregistrement" method='post' action="?<?php if (isset($zone)) echo "zone=$zone"; if (isset($redirurl)) echo "&redirurl=$redirurl"; ?>">
