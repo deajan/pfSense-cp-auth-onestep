@@ -1,5 +1,5 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.44 2016103001");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.44 2016103002");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -49,6 +49,16 @@ function slog($string) {
 	print "<p style=color:red>Value: $string</p>";
 }
 
+// Credit to http://stackoverflow.com/a/4356295/2635443
+function generateRandomString($length = 10) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
 
 if(isset($_GET['language']))
 	$language = cleanInput($_GET["language"]);
@@ -178,8 +188,20 @@ if(isset($_POST["termsOfUse"]))
 			}
 
 			// User name and password for RADIUS
+			//$askForRoomNumber, $askForEmailAddress, $askForFamilyName, $askForSurName,
 			$userName = $emailAddress.$roomNumber;
 			$password = $familyName.$surName;
+
+			if ($userName == "")
+				$userName = $familyName.$surName.$emailAddress.$roomNumber;
+			if ($password == "")
+				$password = $emailAddress.$roomNumber.$familyName.$surName;
+
+			// WARNING: if no user info is entered, userName and password will be random generated
+			if ($userName == "")
+				$userName = generateRandomString();
+			if ($password == "")
+				$password = generateRandomString();
 
 			$check_query = "SELECT username FROM radcheck WHERE username = '$userName';";
 			if (!$result = @mysql_query($check_query))
@@ -564,7 +586,7 @@ input[type="checkbox"]:checked + label span {
 						?>
 					</div>
 					<div class="col-md-6">
-						<form id="enregistrement" method='post' action="?<?php if (isset($zone)) echo "zone=$zone"; if (isset($redirurl)) echo "&redirurl=$redirurl"; ?>">
+						<form id="enregistrement" method='post' action="?<?php if (isset($zone)) echo "zone=$zone"; if (isset($redirurl)) echo "&redirurl=$redirurl"; if (isset($language)) echo "&language=$language"; ?>">
 							<fieldset>
 								<?php if ($askForRoomNumber == true) { ?>
 								<div class="control-group">
