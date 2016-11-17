@@ -1,5 +1,5 @@
 <?php
-DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016103001");
+DEFINE("CONF_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication conf 2016111701");
 // Config file for captive portal
 
 /************************************* TEST ENV */
@@ -43,7 +43,7 @@ $confirmationCode = "";				// Optional connection code asked for login with mini
 
 //// Language function
 
-$validLanguages = Array('en', 'fr');		// When adding languages, add a new entry here
+$validLanguages = Array('en', 'fr', 'es');	// When adding languages, add a new entry here
 $language = "en";				// May be superseeded by passing language parameter in URL
 
 //TODO: function t approach of assigning all strings is not very effective (all strings assigned on every run!)
@@ -159,7 +159,61 @@ $databaseCheckErrorMessage_string = "Impossible de vérifier la base de données
 $incorrectInput_string = "Les données que vous avez entrés ne semblent pas valides.";
 $incorrectConfirmationCode_string = "Le code établissement ne semble pas correct.";
 $noScript_string = "Veuillez cliquer sur Continuer si votre navigateur ne supporte pas le JavaScript.";
+}
 
+if ($language == "es")
+{
+//// Spanish strings
+
+// Page title
+$pageTitle_string = "Acces Wifi";
+
+// UI language strings
+$termsOfUse_string = "Políticas de uso";
+$termsOfUseRead_string = "Leído";
+$termsOfUseAccept_string ="Acepto los";
+$wifiProviedBy_string = "Servicio provisto por $brand";
+$generalUseMessage_string = "Al ser un servicio gratuito, por favor <strong>respetar</strong> las políticas de uso y a los <strong>demas usuarios</strong> al no utilizar todo el ancho de banda disponible.";
+$error_string = "Error";
+$datePrefix_string = "Hoy es";
+$welcome_string = "Bienvenido";
+$welcomeMessage_string = "hotelName le acerca internet gratuitamente.<br/> Está a unos clicks de acceder al servicio.";
+
+// UI field strings
+$roomNumber_string = "Número de habitación";
+$confirmationCode_string = "Código de cofirmación";
+$emailAddress_string = "Email";
+$familyName_string = "Nombre";
+$surName_string = "Apellido";
+
+// Validation strings
+$roomNumberValidation_string = "Ingrese su nombre por favor";
+$confirmationCodeValidation_string = "Ingrese su código de confirmación por favor";
+$emailAddressValidation_string = "Ingrese una dirección de Email válida";
+$familyNameValidation_string = "Ingrese su Nombre por favor";
+$surNameValidation_string = "Ingrese su Apellido por favor";
+$termsOfUseValidation_string = "Acepte la política de uso por favor";
+$minTwoCharacters_string = "Mínimo de dos caracteres";
+$minThreeCharacters_string = "Mínimo de tres caracteres";
+
+// Checkbox strings
+$newsletter_string = "Suscribirse a nuestro newsletter";
+
+// Connect button string
+$connect_string = "Conectar";
+$continue_string = "Continuar";
+
+// Month names
+$monthList = Array('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+
+// Error messages
+$macAdressErrorMessage_string = "Su dispositivo no provee toda la información necesaria para la conección.";
+$databaseConnectErrorMessage_string = "No se puede conectar a la base de datos. ";
+$databaseRegisterErrorMessage_string = "No se puede registrar su cuenta.";
+$databaseCheckErrorMessage_string = "No se puede confirmar su usuario en la base de datos.";
+$incorrectInput_string = "Ingreso incorrecto.";
+$incorrectConfirmationCode_string = "Código incorrecto.";
+$noScript_string = "Presione continuar si su navegador no soporta Javascript.";
 }
 
 // Today format
