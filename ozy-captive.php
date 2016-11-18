@@ -1,7 +1,5 @@
 ﻿<?php
-//TODO: missing jquery validation message for terms of use
-//TODO: test when no entry is mandatory, should not 'autoconnect'
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.46-beta 2016111902");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.46 2016111903");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -128,7 +126,7 @@ if ((!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) && ($askForEmailAddress 
 	$badCheck = true;
 }
 
-if((isset($_POST["termsOfUse"])) || ($askForTermsOfUse == false))
+if(((isset($_POST["termsOfUse"])) || ($askForTermsOfUse == false)) && isset($_POST["connect"]))
 {
 	$regDate = date("Y-m-d H:i:s");
 	if (isset($_POST["newsletter"]))
@@ -667,6 +665,7 @@ input[type="checkbox"]:checked + label span {
 									</div>
 								</div>
 							</fieldset>
+							<input type="hidden" name="connect" value="true">
 						</form>
 					</div>
 				</div>
