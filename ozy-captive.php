@@ -1,5 +1,7 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.44 2016103002");
+//TODO: missing validation message for terms of use
+//TODO: test when no entry is mandatory, should not 'autoconnect'
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.46beta 2016111901");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -72,7 +74,7 @@ if(isset($_GET['zone']))
 if(isset($_GET['redirurl']))
 	$redirurl = cleanInput($_GET["redirurl"]);
 
-if(isset($_POST["termsOfUse"]))
+if((isset($_POST["termsOfUse"])) || ($askForTermsOfUse == false))
 {
 	if (strlen($confirmationCode) > 0)
 	{
@@ -680,28 +682,20 @@ input[type="checkbox"]:checked + label span {
 				});
 				$("#enregistrement").validate({
 					rules:{
-						roomNumber:"required",
-						emailAddress:{
-								required:true,
-								email: true
-							},
-						<?php if (strlen($confirmationCode) > 0) { ?>
-						code:{
-							required:true,
-							minlength: 3
-						},
-						<?php } ?>
-						familyName:{
-							required:true,
-							minlength: 2
-						},
-						surName:{
-							required:true,
-							minlength: 2
-						},
-						termsOfUse:{
-							required:true
-						}
+						<?php
+						if ($askForRoomNumber == true)
+							echo "roomNumber: required,\n";
+						if ($askForEmailAddress == true)
+							echo "emailAddress:{ required:true, email: true },\n";
+						if (strlen($confirmationCode) > 0)
+							echo "code:{ required:true, minlength: 3},\n";
+						if ($askForFamilyName == true)
+							echo "familyName:{ required:true, minlength: 2},\n";
+						if ($askForSurName == true)
+							echo "surName:{ required:true, minlength: 2},\n";
+						if ($askForTermsOfUse == true)
+							echo "termsOfUSe:{ required:true },\n";
+						?>
 					},
 					messages:{
 						roomNumber:"<?php print t('roomNumberValidation_string'); ?>",
@@ -721,7 +715,8 @@ input[type="checkbox"]:checked + label span {
 							required:"<?php print t('surNameValidation_string'); ?>",
 							minlength:"<?php print t('minTwoCharacters_string'); ?>"
 						},
-						termsOfUse:"<?php print t('termsOfUseValidation_string'); ?>"
+						termsOfUse:{ required:"<?php print t('termsOfUseValidation_string'); ?>"
+						},
 					},
 					errorClass: "help-inline",
 					errorElement: "span",
