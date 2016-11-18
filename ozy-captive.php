@@ -695,7 +695,7 @@ input[type="checkbox"]:checked + label span {
 						if ($askForSurName == true)
 							echo "surName:{ required:true, minlength: 2},\n";
 						if ($askForTermsOfUse == true)
-							echo "termsOfUSe:{ required:true },\n";
+							echo "termsOfUse:{ required:true },\n";
 						?>
 					},
 					messages:{
