@@ -1,7 +1,7 @@
 ﻿<?php
-//TODO: missing validation message for terms of use
+//TODO: missing jquery validation message for terms of use
 //TODO: test when no entry is mandatory, should not 'autoconnect'
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.46beta 2016111901");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.46-beta 2016111902");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -74,61 +74,62 @@ if(isset($_GET['zone']))
 if(isset($_GET['redirurl']))
 	$redirurl = cleanInput($_GET["redirurl"]);
 
-if((isset($_POST["termsOfUse"])) || ($askForTermsOfUse == false))
+if (strlen($confirmationCode) > 0)
 {
-	if (strlen($confirmationCode) > 0)
+	if (isset($_POST["code"]))
 	{
-		if (isset($_POST["code"]))
+		$code = cleanInput($_POST["code"]);
+		if ($confirmationCode != $code)
 		{
-			$code = cleanInput($_POST["code"]);
-			if ($confirmationCode != $code)
-			{
-				$checkMessage = t('incorrectConfirmationCode_string');
-				$badCheck = true;
-			}
-		}
-		else
-		{
-			$checkMessage = t('incorrectConfirmationcode_string');
+			$checkMessage = t('incorrectConfirmationCode_string');
 			$badCheck = true;
 		}
 	}
-	if (isset($_POST["familyName"]))
-		$familyName = cleanInput($_POST["familyName"]);
 	else
-		$familyName = false;
-	if ((strlen($familyName) < 2) && ($askForFamilyName == true))
 	{
-		$checkMessage = t('incorrectInput_string');
+		$checkMessage = t('incorrectConfirmationcode_string');
 		$badCheck = true;
 	}
-	if (isset($_POST["surName"]))
-		$surName = cleanInput($_POST["surName"]);
-	else
-		$surName = false;
-	if ((strlen($surName) < 2) && ($askForSurName == true))
-	{
-		$checkMessage = t('incorrectInput_string');
-		$badCheck = true;
-	}
-	if (isset($_POST["roomNumber"]))
-		$roomNumber = cleanInput($_POST["roomNumber"]);
-	else
-		$roomNumber = false;
-	if ((strlen($roomNumber) < 1) && ($askForRoomNumber == true))
-	{
-		$checkMessage = t('incorrectInput_string');
-		$badCheck = true;
-	}
-	if (isset($_POST["emailAddress"]))
-		$emailAddress = cleanInput($_POST["emailAddress"]);
-	else
-		$emailAddress = false;
-	if ((!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) && ($askForEmailAddress == true))
-	{
-		$checkMessage = t('incorrectInput_string');
-		$badCheck = true;
-	}
+}
+if (isset($_POST["familyName"]))
+	$familyName = cleanInput($_POST["familyName"]);
+else
+	$familyName = false;
+if ((strlen($familyName) < 2) && ($askForFamilyName == true))
+{
+	$checkMessage = t('incorrectInput_string');
+	$badCheck = true;
+}
+if (isset($_POST["surName"]))
+	$surName = cleanInput($_POST["surName"]);
+else
+	$surName = false;
+if ((strlen($surName) < 2) && ($askForSurName == true))
+{
+	$checkMessage = t('incorrectInput_string');
+	$badCheck = true;
+}
+if (isset($_POST["roomNumber"]))
+	$roomNumber = cleanInput($_POST["roomNumber"]);
+else
+	$roomNumber = false;
+if ((strlen($roomNumber) < 1) && ($askForRoomNumber == true))
+{
+	$checkMessage = t('incorrectInput_string');
+	$badCheck = true;
+}
+if (isset($_POST["emailAddress"]))
+	$emailAddress = cleanInput($_POST["emailAddress"]);
+else
+	$emailAddress = false;
+if ((!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) && ($askForEmailAddress == true))
+{
+	$checkMessage = t('incorrectInput_string');
+	$badCheck = true;
+}
+
+if((isset($_POST["termsOfUse"])) || ($askForTermsOfUse == false))
+{
 	$regDate = date("Y-m-d H:i:s");
 	if (isset($_POST["newsletter"]))
 		$newsletter = 1;
@@ -277,7 +278,7 @@ if((isset($_POST["termsOfUse"])) || ($askForTermsOfUse == false))
 	}
 }
 else
-	WelcomePage();
+	WelcomePage('', $emailAddress, $roomNumber, $familyName, $surName, $code);
 
 function Login()
 {
@@ -304,7 +305,7 @@ function Login()
 <?php
 }
 
-function WelcomePage($message = '')
+function WelcomePage($message = '', $emailAddress = '', $roomNumber = '', $familyName = '', $surName = '', $code = '')
 {
 	global $brand;
 	global $hotelName;
@@ -684,7 +685,7 @@ input[type="checkbox"]:checked + label span {
 					rules:{
 						<?php
 						if ($askForRoomNumber == true)
-							echo "roomNumber: required,\n";
+							echo "roomNumber:{ required:true },\n";
 						if ($askForEmailAddress == true)
 							echo "emailAddress:{ required:true, email: true },\n";
 						if (strlen($confirmationCode) > 0)
