@@ -1,4 +1,17 @@
-v0.42 - 19 May 2016
+v0.46 - 19 Nov 2016
+- Prevent autoconnect when no user data is asked at all
+- Keep user entry when server validation fails
+- Fixed an issue where terms of use where mandatory even if askForTermsOfUse = false
+- Fixed a typo preventing terms of use validation string to appear
+- Added spanish translation (thanks to joel.dq from Pfsense forum)
+
+v0.44 - 09 Nov 2016
+- Language can now be set on the fly with language=XX url parameter
+- Language selection is possible for the end user via links on the login page
+- When not sufficient user data is askeed, credentials are random generated
+- Fixed typo in admin sql file
+
+v0.42 - 24 May 2016
 - Removed sidelogo png in favor of a CSS text transformation
 - Fixed wrong month in date
 
