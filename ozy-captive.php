@@ -22,16 +22,6 @@ global $UPDATE;
 // Config file
 include "captiveportal-config.php";
 
-// Get IP and mac address
-$ipAddress=$_SERVER['REMOTE_ADDR'];
-#run the external command, break output into lines
-$arp=`arp $ipAddress`;
-$lines = explode(" ", $arp);
-if (!empty($lines[3]))
-	$macAddress = $lines[3]; // Works on FreeBSD
-else
-	$macAddress = "fa:ke:ma:c:ad:dr"; // Fake MAC on dev station which is probably not FreeBSD
-
 // Clean input function
 function cleanInput($input) {
 	$search = array(
@@ -42,8 +32,19 @@ function cleanInput($input) {
 	);
 
 	$output = preg_replace($search, '', $input);
+	$output = mysql_real_escape_string($output); // protect against SQL Injections
 	return $output;
 }
+
+// Get IP and mac address
+$ipAddress=$_SERVER['REMOTE_ADDR'];
+#run the external command, break output into lines
+$arp=`arp $ipAddress`;
+$lines = explode(" ", $arp);
+if (!empty($lines[3]))
+	$macAddress = cleanInput($lines[3]); // Works on FreeBSD (cleanInput should not do anything on MACs)
+else
+	$macAddress = "fa:ke:ma:c:ad:dr"; // Fake MAC on dev station which is probably not FreeBSD
 
 function slog($string) {
 	print "<p style=color:red>Value: $string</p>";
