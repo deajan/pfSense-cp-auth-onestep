@@ -1,3 +1,7 @@
+v0.48 - dd Mmm YYYY
+- Added MySQL prepared statements for security reasons (see #1 on github by keisentraut)
+- Fixed update also triggered an insert in reg_users
+
 v0.46 - 19 Nov 2016
 - Prevent autoconnect when no user data is asked at all
 - Keep user entry when server validation fails
