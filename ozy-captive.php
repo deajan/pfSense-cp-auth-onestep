@@ -1,5 +1,6 @@
 ﻿<?php
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.46 2016111903");
+
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.48-dev 2017042701");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
@@ -27,6 +28,8 @@ $ipAddress=$_SERVER['REMOTE_ADDR'];
 #run the external command, break output into lines
 $arp=`arp $ipAddress`;
 $lines = explode(" ", $arp);
+$badCheck = false;
+
 if (!empty($lines[3]))
 	$macAddress = $lines[3]; // Works on FreeBSD
 else
@@ -58,6 +61,17 @@ function generateRandomString($length = 10) {
         $randomString .= $characters[rand(0, $charactersLength - 1)];
     }
     return $randomString;
+}
+
+function dbError($db, $errMessage) {
+	trigger_error($errMessage . utf8_encode($db->error));
+
+	if (DEBUG == true)
+		WelcomePage($errMessage . utf8_encode($db->error));
+	else
+		WelcomePage($errMessage);
+	$db->close();
+	die();
 }
 
 if(isset($_GET['language']))
@@ -140,56 +154,85 @@ if(((isset($_POST["termsOfUse"])) || ($askForTermsOfUse == false)) && isset($_PO
 		die();
 	}
 
-	$con = @mysql_connect(DBHOST,DBUSER,DBPASS);
-	if (!$con)
+	$db = new mysqli(DBHOST, DBUSER, DBPASS, DBNAME);
+	if (mysqli_connect_errno())
 	{
 		if (DEBUG == true)
-			$error_message = t('databaseConnectErrorMessage_string') . utf8_encode(mysql_error());
+			$error_message = t('databaseConnectErrorMessage_string') . utf8_encode(mysqli_connect_errno());
 		else
 			$error_message = t('databaseConnectErrorMessage_string');
 		WelcomePage($error_message);
 	}
 	else
 	{
-		@mysql_select_db(DBNAME, $con);
 		if ($macAddress!=NULL)
 		{
-			$query = "INSERT INTO reg_users (familyName, surName, roomNumber, emailAddress, macAddress, ipAddress, regDate, identificator, newsletter) VALUES ('$familyName', '$surName', '$roomNumber', '$emailAddress', '$macAddress' , '$ipAddress', '$regDate', '$identificator', '$newsletter');";
+			$columnNames = "";
+			$valueNames = "";
+			$updateQuery = "";
+			$create = false;
+
+			// Don't want to write long prepared statements, have php write them for me
+
+			$parameters = array();
+			$parameters['familyName'] = $familyName;
+			$parameters['surName'] = $surName;
+			$parameters['roomNumber'] = $roomNumber;
+			$parameters['emailAddress'] = $emailAddress;
+			$parameters['macAddress'] = $macAddress;
+			$parameters['ipAddress'] = $ipAddress;
+			$parameters['regDate'] = $regDate;
+			$parameters['identificator'] = $identificator;
+			$parameters['newsletter'] = $newsletter;
+
 			if ($UPDATE == true)
 			{
-				$check_query = "SELECT * FROM reg_users WHERE macAddress = '$macAddress' AND emailAddress = '$emailAddress';";
-				if( !$result = @mysql_query($check_query))
+				if (!$statement = $db->prepare("SELECT * FROM reg_users WHERE macAddress = ? AND emailAddress = ? LIMIT 1"))
+					$dbError($db, t('databaseRegisterErrorMessage_string')." (1) :");
+				else
 				{
-					if (DEBUG == true)
+					$statement->bind_param('ss', $macAddress, $emailAddress);
+					if (!$statement->execute())
+						dbError($db, t('databaseRegisterErrorMessage_string')." (1) :");
+					$statement->store_result();
+					if ($statement->num_rows != 0)
 					{
-						slog($check_query);
-						$error_message = t('databaseCheckErrorMessage_string')." (1) :" . utf8_encode(mysql_error());
+						$statement->close();
+						if (!$statement = $db->prepare("UPDATE reg_users SET familyName = ?, surName = ?, roomNumber = ?, emailAddress = ?, macAddress = ?, ipAddress = ?, regDate = ?, identificator = ?, newsletter = ? WHERE macAddress = ? AND emailAddress = ?"))
+							dbError($db, t('databaseRegisterErrorMessage_string')." (1) :");
+						else
+						{
+							$statement->bind_param("sssssssssss", $parameters['familyName'], $parameters['surName'], $parameters['roomNumber'], $parameters['emailAddress'], $parameters['macAddress'], $parameters['ipAddress'], $parameters['regDate'], $parameters['identificator'], $parameters['newsletter'], $parameters['macAddress'], $parameters['emailAddress']);
+							if (!$statement->execute())
+								dbError($db, t('databaseRegisterErrorMessage_string')." (1) :");
+							$statement->close();
+						}
 					}
 					else
-						$error_message = t('databaseCheckErrorMessage_string')." (1)";
-					WelcomePage($error_message);
-					die();
+					{
+						$statement->close();
+						$create = true;
+					}
 				}
-				$numrows = @mysql_num_rows($result);
-				if ($numrows != 0)
-					$query = "UPDATE reg_users SET familyName = '$familyName', surName = '$surName', roomNumber = '$roomNumber' , ipAddress = '$ipAddress', regDate = '$regDate', identificator = '$identificator', newsletter = '$newsletter' WHERE macAddress = '$macAddress' AND emailAddress = '$emailAddress';";
 			}
+			else
+				$create = true;
 
-			if (!@mysql_query($query))
+			// I know this is dirty, but I don't feel like recoding everything into subfunctions
+			if ($create == true)
 			{
-				if (DEBUG == true)
-				{
-					slog($query);
-					$error_message = t('databaseRegisterErrorMessage_string')." (1) :" . utf8_encode(mysql_error());
-				}
+				if (!$statement = $db->prepare("INSERT INTO reg_users (familyName, surName, roomNumber, emailAddress, macAddress, ipAddress, regDate, identificator, newsletter) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"))
+					dbErrror($db, t('databaseRegisterErrorMessage_string')." (1) :");
 				else
-					$error_message = t('databaseRegisterErrorMessage_string')." (1)";
-				WelcomePage($error_message);
-				die();
+				{
+					$statement->bind_param("sssssssss", $parameters['familyName'], $parameters['surName'], $parameters['roomNumber'], $parameters['emailAddress'], $parameters['macAddress'], $parameters['ipAddress'], $parameters['regDate'], $parameters['identificator'], $parameters['newsletter']);
+					if (!$statement->execute())
+						dbError($db, t('databaseRegisterErrorMessage_string')." (1) :");
+					$statement->close();
+				}
 			}
 
 			// User name and password for RADIUS
-			//$askForRoomNumber, $askForEmailAddress, $askForFamilyName, $askForSurName,
 			$userName = $emailAddress.$roomNumber;
 			$password = $familyName.$surName;
 
@@ -204,75 +247,72 @@ if(((isset($_POST["termsOfUse"])) || ($askForTermsOfUse == false)) && isset($_PO
 			if ($password == "")
 				$password = generateRandomString();
 
-			$check_query = "SELECT username FROM radcheck WHERE username = '$userName';";
-			if (!$result = @mysql_query($check_query))
-			{
-				if (DEBUG == true)
-				{
-					slog($check_query);
-					$error_message = t('databaseCheckErrorMessage_string')." (2) :" . utf8_encode(mysql_error());
-				}
-				else
-					$error_message = t('databaseCheckErrorMessage_string')." (2)";
-				WelcomePage($error_message);
-				die();
-			}
-
-			$numrows = @mysql_num_rows($result);
-			if ($numrows != 0)
-				$query = "UPDATE radcheck SET value = '$password' WHERE username = '$userName';";
+			if (!$statement = $db->prepare("SELECT username FROM radcheck WHERE username = ?"))
+				dbError($db, t('databaseRegisterErrorMessage_string')." (2) :");
 			else
-				$query = "INSERT INTO radcheck (username, attribute, value) VALUES ('$userName', 'Password', '$password');";
-
-			if (!@mysql_query($query))
 			{
-				if (DEBUG == true)
-				{
-					slog($query);
-                                        $error_message = t('databaseRegisterErrorMessage_string')." (2) :" . utf8_encode(mysql_error());
-				}
-                                else
-                                       	$error_message = t('databaseRegisterErrorMessage_string')." (2)";
-                               	WelcomePage($error_message);
-				die();
-			}
+				$statement->bind_param("s", $userName);
+				if (!$statement->execute())
+					dbError($db, t('databaseRegisterErrorMessage_string')." (2) :");
 
-			$check_query = "SELECT username FROM radusergroup WHERE username = '$userName';";
-			if (!$result = @mysql_query($check_query))
-			{
-				if (DEBUG == true)
+				$statement->store_result();
+				if ($statement->num_rows != 0)
 				{
-					slog($check_query);
-					$error_message = t('databaseCheckErrorMessage_string')." (3) :" . utf8_encode(mysql_error());
+					$statement->close();
+					if (!$statement = $db->prepare("UPDATE radcheck SET value = ? WHERE username = ?"))
+						dbError($db, t('databaseRegisterErrorMessage_string')." (2) :");
+					else
+					{
+						$statement->bind_param("ss", $password, $userName);
+						if (!$statement->execute())
+							dbError($db, t('databaseRegisterErrorMessage_string')." (2) :");
+					}
 				}
 				else
-					$error_message = t('databaseCheckErrorMessage_string')." (3)";
-				WelcomePage($error_message);
-				die();
-			}
-
-			$numrows = @mysql_num_rows($result);
-			if ($numrows == 0)
-			{
-				$query = "INSERT INTO radusergroup (username, groupname) VALUES ('$userName', 'Free');";
-				if (!@mysql_query($query))
 				{
-					if (DEBUG == true)
+					$statement->close();
+					if (!$statement = $db->prepare("INSERT INTO radcheck (username, attribute, value) VALUES (?, 'Password', ?)"))
+						dbError($db, t('databaseRegisterErrorMessage_string')." (2) :");
+					else
 					{
-						slog($query);
-                                        	$error_message = t('databaseRegisterErrorMessage_string')." (3) :" . utf8_encode(mysql_error());
+						$statement->bind_param("ss", $userName, $password);
+						if (!$statement->execute())
+							dbError($db, t('databaseRegisterErrorMessage_string')." (2) :");
 					}
-                                	else
-                                       		$error_message = t('databaseRegisterErrorMessage_string')." (3)";
-                               		WelcomePage($error_message);
-					die();
 				}
 			}
+
+			$statement->close();
+			if (!$statement = $db->prepare("SELECT username FROM radusergroup WHERE username = ?"))
+				dbError($db, t('databaseRegisterErrorMessage_string')." (3)a :");
+			else
+			{
+				$statement->bind_param("s", $userName);
+				if (!$statement->execute())
+					dbError($db, t('databaseRegisterErrorMessage_string')." (3) :");
+				else
+				{
+					$statement->store_result();
+					if ($statement->num_rows == 0)
+					{
+						$statement->close();
+						if (!$statement = $db->prepare("INSERT INTO radusergroup (username, groupname) VALUES (?, 'Free')"))
+							dbError($db, t('databaseRegisterErrorMessage_string')." (3) :");
+						else
+						{
+							$statement->bind_param("s", $userName);
+							if (!$statement->execute())
+								dbError($db, t('databaseRegisterErrorMessage_string')." (3) :");
+							$statement->close();
+						}
+					}
+				}
+			}
+			$db->close();
 			Login();
 		}
 		else
 			WelcomePage(t('macAdressErrorMessage_string'));
-	@mysql_close($con);
 	}
 }
 else
