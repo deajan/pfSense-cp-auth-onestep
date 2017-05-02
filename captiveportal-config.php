@@ -20,7 +20,7 @@ DEFINE("DBNAME", "radius");
 
 // When set to true, all successful user logins are written to database
 // When set to false, only the last successful user login is written to database
-$UPDATE = true;
+$UPDATE = false;
 
 //// Hotel identification
 
@@ -67,7 +67,7 @@ $generalUseMessage_string = "Being a free service, please <strong>respect</stron
 $error_string = "Error";
 $datePrefix_string = "The";
 $welcome_string = "Welcome";
-$welcomeMessage_string = "$hotelName is happy to provide you free internet access.<br/> You're just 4 clics away from unlimited web access for your whole stay.";
+$welcomeMessage_string = "$hotelName is happy to provide you free internet access.<br/> You're just a couple of clics away from unlimited web access for your whole stay.";
 
 // UI field strings
 $roomNumber_string = "Room Number";
@@ -122,7 +122,7 @@ $generalUseMessage_string = "S'agissant d'un service gratuit, veuillez <strong>r
 $error_string = "Erreur";
 $datePrefix_string = "Le";
 $welcome_string = "Bienvenue";
-$welcomeMessage_string = "L'équipe de notre établissement $hotelName est heureuse de vous offrir la connexion internet.<br/> Vous n'êtes plus qu'à 4 clics d'un accès web illimité pour toute la durée de votre séjour.";
+$welcomeMessage_string = "L'équipe de notre établissement $hotelName est heureuse de vous offrir la connexion internet.<br/> Vous n'êtes plus qu'à quelques clics d'un accès web illimité pour toute la durée de votre séjour.";
 
 // UI field strings
 $roomNumber_string = "Numéro de chambre";
