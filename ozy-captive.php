@@ -1,6 +1,6 @@
 ﻿<?php
 
-define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.48 2017042701");
+define("APP_BUILD", "OZY's CAPTIVE PORTAL FOR RADIUS/MySQL authentication v0.49 2018093001");
 /*********************************************************************/
 /* Workflow:                                                         */
 /*                                                                   */
