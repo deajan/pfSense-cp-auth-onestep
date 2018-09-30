@@ -271,7 +271,7 @@ if(((isset($_POST["termsOfUse"])) || ($askForTermsOfUse == false)) && isset($_PO
 				else
 				{
 					$statement->close();
-					if (!$statement = $db->prepare("INSERT INTO radcheck (username, attribute, value) VALUES (?, 'Password', ?)"))
+					if (!$statement = $db->prepare("INSERT INTO radcheck (username, attribute, value) VALUES (?, 'Cleartext-Password', ?)"))
 						dbError($db, t('databaseRegisterErrorMessage_string')." (2) :");
 					else
 					{
