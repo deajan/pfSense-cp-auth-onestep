@@ -1,3 +1,7 @@
+
+v0.49 - 30 Sep 2018
+- Added pfSense 2.4.x compatibility (FreeRADIUS 3.x), thanks to Python-sublab and Milo-81
+
 v0.48 - 03 May 2017
 - Added MySQL prepared statements for security reasons (see #1 on github by keisentraut)
 
