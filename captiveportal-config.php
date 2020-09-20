@@ -43,7 +43,7 @@ $confirmationCode = "";				// Optional connection code asked for login with mini
 
 //// Language function
 
-$validLanguages = Array('en', 'fr', 'es');	// When adding languages, add a new entry here
+$validLanguages = Array('en', 'fr', 'es', 'it');	// When adding languages, add a new entry here
 $language = "en";				// May be superseeded by passing language parameter in URL
 
 //TODO: function t approach of assigning all strings is not very effective (all strings assigned on every run!)
@@ -216,6 +216,62 @@ $incorrectConfirmationCode_string = "Código incorrecto.";
 $noScript_string = "Presione continuar si su navegador no soporta Javascript.";
 }
 
+  if ($language == "it")
+{
+//// Italian strings
+
+// Page title
+$pageTitle_string = "Accesso Wifi";
+
+// UI language strings
+$termsOfUse_string = "Termini di utilizzo";
+$termsOfUseRead_string = "Ho letto";
+$termsOfUseAccept_string ="Accetto i";
+$wifiProvidedBy_string = "Questo servizio è fornito da $brand";
+$generalUseMessage_string = "Trattandosi di un servizio gratuito, si prega di <strong>rispettare</strong> i termini di utilizzo e gli <strong>altri utenti</strong> senza saturare la banda disponibile.";
+$error_string = "Errore";
+$datePrefix_string = "Oggi è il";
+$welcome_string = "Benvenuto";
+$welcomeMessage_string = "$hotelName le fornisce internet gratuitamente.<br/> Basta un click per accedere al servizio.";
+
+// UI field strings
+$roomNumber_string = "Numero della camera";
+$confirmationCode_string = "Codice di conferma";
+$emailAddress_string = "Email";
+$familyName_string = "Cognome";
+$surName_string = "Nome";
+
+// Validation strings
+$roomNumberValidation_string = "Si prega di inserire il numero della camera";
+$confirmationCodeValidation_string = "Si prega di inserire il codice di conferma";
+$emailAddressValidation_string = "Si prega di inserire un indirizzo di posta elettronica valido";
+$familyNameValidation_string = "Si prega di inserire il cognome";
+$surNameValidation_string = "Si prega di inserire il nome";
+$termsOfUseValidation_string = "Si prega di accettare i termini di utilizzo";
+$minTwoCharacters_string = "Lunghezza minima due caratteri";
+$minThreeCharacters_string = "Lunghezza minima tre caratteri";
+
+// Checkbox strings
+$newsletter_string = "Desidero iscrivermi alla vostra newsletter";
+
+// Connect button string
+$connect_string = "Connetti";
+$continue_string = "Continua";
+
+// Month names
+$monthList = Array('Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre');
+
+// Error messages
+$macAdressErrorMessage_string = "Il suo dispositivo non fornisce tutte le informazioni necessarie per la connessione.";
+$databaseConnectErrorMessage_string = "Impossibile connettersi al database.";
+$databaseRegisterErrorMessage_string = "Impossibile creare il suo utente.";
+$databaseCheckErrorMessage_string = "Impossibile interrogare il database.";
+$incorrectInput_string = "I dati immessi non sono validi.";
+$incorrectConfirmationCode_string = "Il codice inserito non è valido.";
+$noScript_string = "Si prega di premere Continua se il browser non supporta JavaScript.";
+}
+
+  
 // Today format
 $today = date('j')." ".$monthList[(date('n') - 1)]." ".date('Y');
 
