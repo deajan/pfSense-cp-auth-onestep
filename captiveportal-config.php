@@ -177,7 +177,7 @@ $generalUseMessage_string = "Al ser un servicio gratuito, por favor <strong>resp
 $error_string = "Error";
 $datePrefix_string = "Hoy es";
 $welcome_string = "Bienvenido";
-$welcomeMessage_string = "hotelName le acerca internet gratuitamente.<br/> Está a unos clicks de acceder al servicio.";
+$welcomeMessage_string = "$hotelName le acerca internet gratuitamente.<br/> Está a unos clicks de acceder al servicio.";
 
 // UI field strings
 $roomNumber_string = "Número de habitación";
